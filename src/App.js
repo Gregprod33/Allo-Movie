@@ -1,25 +1,68 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
+import { Header, MovieList, MovieDetails, Loading, SearchBar } from './components';
+import apiMovie, { apiMovieMap } from './conf/api.movie'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends Component {
+
+  constructor(props) {
+    super(props);
+  
+    this.state = {
+      movies: null,
+      selectedMovie: 0,
+      loaded: false
+    }  
+  }
+
+  updateSelectedMovie = (index) => {
+    this.setState ({
+      selectedMovie: index
+    })
+  }
+
+
+  componentDidMount() {
+    apiMovie.get('/discover/movie?api_key=6636b71f59e211d9a37a9eda92d8d050')
+      .then( response => response.data.results)
+      .then( moviesApi => {
+        const movies = moviesApi.map( apiMovieMap)
+        console.log(movies);
+        this.updateMovies(movies);
+      })
+      .catch( err => console.log(err));
+  }
+
+
+  updateMovies = (movies) => {
+    this.setState({
+      movies,
+      loaded: true
+    })
+  }
+
+  
+
+  render() {
+    return (
+
+      <div className="App d-flex flex-column">
+        <Header />
+        <SearchBar updateMovies={ this.updateMovies } />
+        { this.state.loaded ? (
+          <div className="d-flex flex-row flex-fill pt-4 p-2">
+            <MovieList movies= { this.state.movies } updateSelectedMovie= {
+            this.updateSelectedMovie } />
+            <MovieDetails movie={ this.state.movies[this.state.selectedMovie] } />
+          </div> 
+        ) : (
+          <Loading />
+        ) 
+      }
+        
+      </div>
+      );
+    }
 }
 
 export default App;
