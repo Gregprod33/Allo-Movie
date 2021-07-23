@@ -10,7 +10,6 @@ export default class MovieList extends Component {
         <MovieElement key={ m.title + index } movie= { m } updateSelectedMovie= { () => { this.props.updateSelectedMovie(index) } } />
       ))}
       
-      
     </div>
     )
   }
